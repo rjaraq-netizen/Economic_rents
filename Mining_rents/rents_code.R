@@ -83,7 +83,7 @@ df2 <- df2 %>%
   ) %>%
   ungroup()
 # muy importante fijar el plot_year 
-plot_year = 2020
+plot_year = 2021
 # --- 2) Filtrar año, el "n" indica el numero de paises top que se sacan
 df_year <- df2 %>%
   filter(Year == plot_year) %>%
