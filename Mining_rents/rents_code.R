@@ -19,6 +19,11 @@ df <- df %>%
   )
 
 df <- df %>%
+  mutate(
+    year= as.numeric(substr(year, 1, 4))   # extrae los primeros 4 dígitos
+  )
+
+df <- df %>%
   pivot_wider(
     id_cols = c(`Country Name`, year),
     names_from = `Series Code`,
@@ -77,8 +82,8 @@ df2 <- df2 %>%
     production_share = Production / world_production 
   ) %>%
   ungroup()
-
-plot_year = 2023
+# muy importante fijar el plot_year 
+plot_year = 2020
 # --- 2) Filtrar año, el "n" indica el numero de paises top que se sacan
 df_year <- df2 %>%
   filter(Year == plot_year) %>%
@@ -94,10 +99,75 @@ ggplot(df_year, aes(x = Country_plot, y = production_share)) +
   geom_col() +
   coord_flip() +
   labs(
-    title = "Top 10 productores de cobre como % del total mundial (2024)",
+    title = paste("Top 10 productores de cobre como % del total mundial (", plot_year, ")", sep = ""),
     x = "País",
-    y = "Participación mundial"
+    y = "Participación mundial",
+    caption = "Fuente: KAPSARC – Production of Copper Mine dataset"
   ) +
-  scale_y_continuous(labels = scales::percent_format())
+  scale_y_continuous(labels = scales::percent_format()) +
+  theme(
+    plot.caption = element_text(hjust = 0, size = 9, color = "gray40")
+  )
+
+# Grafico 2 
+
+name_fix <- c(
+  "USA" = "United States",
+  "Congo, Democratic Republic" = "Congo, Dem. Rep.",
+  "Russia" = "Russian Federation"
+)
+
+
+df_year <- df_year %>%
+  mutate(
+    Country_std = dplyr::recode(Country, !!!name_fix)
+  )
+
+# --- 1) Obtener los top 6 países según producción 2023 ---
+top_countries <- df_year %>%
+  arrange(desc(production_share)) %>%
+  slice_head(n = 6) %>%
+  pull(Country_std)
+
+# --- 2) Filtrar df principal para esos países y años 1970–2021 ---
+df_plot <- df %>%
+  filter(
+    `Country Name` %in% top_countries,
+    year >= 1970,
+    year <= plot_year
+  ) %>%
+  mutate(
+    Country = factor(`Country Name`, levels = top_countries)
+  )
+
+title <- paste0(
+  "Mundo: Rentas anuales de la minería en los 6 países\n",
+  "con mayor producción de cobre al año ", plot_year,
+  " — 1970–", plot_year
+)
+
+
+ggplot(df_plot, aes(x = year, y = mineral_rents, color = Country)) +
+  geom_line(linewidth = 1.1, alpha = 0.9) +
+  geom_point(size = 1.3, alpha = 0.7) +
+  labs(
+    title = title,
+    x = "Año",
+    y = "Mineral rents",
+    color = "País"
+  ) +
+  scale_x_continuous(
+    breaks = seq(1970, plot_year, by = 10),
+    limits = c(1970, plot_year)
+  )  +
+  theme_minimal(base_size = 14) +
+  theme(
+    legend.position = "right",
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    plot.title = element_text(face = "bold", size = 16),
+    axis.text = element_text(size = 12)
+  )
+
 
 
