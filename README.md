@@ -15,3 +15,9 @@ sectores de cmf: https://www.cmfchile.cl/portal/estadisticas/617/w3-propertyvalu
 https://www.cmfchile.cl/portal/estadisticas/617/w3-propertyvalue-48018.html
 
 https://www.sii.cl/ayudas/ayudas_por_servicios/1956-codigos-1959.html
+
+Objetivos a realizar:
+- Ver en que moneda esta la base de Refinitiv Eikon
+- Si pasar de USD a CLP o viceversa
+- Ordenar codigo y ver pasos (bases) relevantes
+- Ver variables relevantes
